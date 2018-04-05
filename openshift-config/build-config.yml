@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: BuildConfig
+metadata:
+  name: helloservice
+  namespace: hello-service
+  labels:
+    app: helloservice
+spec:
+  triggers: []
+  runPolicy: Serial
+  source:
+    type: Binary
+    binary:
+      asFile: cpa.tar.gz
+    dockerfile: |
+        FROM openjdk
+        USER root
+        RUN groupadd -g 3000 appuser && \
+        useradd -r -u 3000 -g appuser appuser
+        RUN mkdir -p /opt/app
+        ADD ${APP_NAME} /opt/app
+        RUN chown appuser:appuser -R /opt/
+        USER appuser:appuser
+        ENV HOME=/opt/app
+        WORKDIR $HOME
+        ENV PORT=${APP_PORT}
+        EXPOSE $PORT
+        ENTRYPOINT ["java", "-jar", "hello-service"]
+
+  strategy:
+    type: Docker
+    dockerStrategy:
+      from:
+        kind: ImageStreamTag
+        namespace: hello-service
+        name: openjdk:latest
+  output:
+    to:
+      kind: ImageStreamTag
+      name: 'helloservice:latest'
+  resources: {}
+  postCommit: {}
+  nodeSelector: null
+  

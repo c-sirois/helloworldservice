@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: BuildConfig
+metadata:
+  name: helloservice-pipeline
+  namespace: hello-service
+  labels:
+    app: helloservice-pipeline
+spec:
+  triggers: []
+  runPolicy: Serial
+  source:
+    git:
+      ref: master
+      uri: 'https://github.com/c-sirois/helloworldservice.git'
+    sourceSecret:
+      name: openshift-source-builder
+    type: Git
+  strategy:
+    type: JenkinsPipeline
+    jenkinsPipelineStrategy:
+      jenkinsfilePath: openshift-config/Jenkinsfile
+  output: {}
+  resources: {}
+  postCommit: {}
+  nodeSelector: null

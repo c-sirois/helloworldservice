@@ -12,12 +12,12 @@ node('maven'){
       }
       stage('CreateContainer'){
         steps{
-          sh "oc start-build helloservice --from-file=service.jar --follow -n service_dev"
+          sh "oc start-build helloservice --from-file=hello-service.jar --follow -n hello-service_dev"
           }
         }
       stage('Deploy to Test Env'){
         steps{
-          openshiftDeploy deploymentConfig: "helloservice", namespace: service_test
+          openshiftDeploy deploymentConfig: "hello-service-test", namespace: hello-service
           }
         }
       stage('Testing'){
@@ -27,12 +27,12 @@ node('maven'){
         }
       stage('Deploy to prod'){
         steps{
-          openshiftDeploy deploymentConfig: "hello-app-prod", namespace: project
+          openshiftDeploy deploymentConfig: "hello-service-prod", namespace: project
           }
         }
       stage ('Prod tests'){
       steps{
-          prod-test.sh // Production test. If exit 1, should fail -- script should just send an emails
+          prod-test.sh // Production test. If exit 1, should fail - script should send an email
           }
         }
       }

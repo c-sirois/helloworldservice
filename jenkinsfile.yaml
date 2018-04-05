@@ -1,0 +1,39 @@
+node('maven'){
+    stages{
+      stage('Checkout'){
+          checkout scm
+      }
+      stage('Build'){
+          steps {
+            sh 'mvn clean package'
+            echo 'Building..'
+            sh 'mv target/*.jar hello-service.jar'
+        }
+      }
+      stage('CreateContainer'){
+        steps{
+          sh "oc start-build helloservice --from-file=service.jar --follow -n service_dev"
+          }
+        }
+      stage('Deploy to Test Env'){
+        steps{
+          openshiftDeploy deploymentConfig: "helloservice", namespace: service_test
+          }
+        }
+      stage('Testing'){
+        steps{
+          autotest.sh // Test script, IF exit 1 fails and pipeline will stop
+          }
+        }
+      stage('Deploy to prod'){
+        steps{
+          openshiftDeploy deploymentConfig: "hello-app-prod", namespace: project
+          }
+        }
+      stage ('Prod tests'){
+      steps{
+          prod-test.sh // Production test. If exit 1, should fail -- script should just send an emails
+          }
+        }
+      }
+    }

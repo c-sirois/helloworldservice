@@ -12,5 +12,7 @@ File: prod-test.sh will need to be created or exist
 Service: helloworld code would need to be added to repo
 
 Prerequisites:
+
 Openshift Instance
+
 Access to the internet to pull containers
